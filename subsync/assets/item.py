@@ -286,6 +286,7 @@ def createAsset(typ, params=None):
             'dict':    DictAsset,
             'speech':  SpeechAsset,
             'subsync': SelfUpdaterAsset,
+            'subsync-ptbr': SelfUpdaterAsset,
             }
 
     T = types.get(typ, Asset)
