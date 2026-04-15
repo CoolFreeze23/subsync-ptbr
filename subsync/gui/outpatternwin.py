@@ -68,7 +68,9 @@ class OutputPatternWin(subsync.gui.layout.outpatternwin.OutputPatternWin):
         if self.m_checkFileAppendStreamNo.GetValue():
             res.append('.{ref_no}')
 
-        if self.m_radioTypeAss.GetValue():
+        if self.m_radioTypeSameAsInput.GetValue():
+            res.append('.{sub_ext}')
+        elif self.m_radioTypeAss.GetValue():
             res.append('.ass')
         elif self.m_radioTypeSsa.GetValue():
             res.append('.ssa')
@@ -96,7 +98,9 @@ class OutputPatternWin(subsync.gui.layout.outpatternwin.OutputPatternWin):
                     return False
 
                 ext = p[-1]
-                if ext == '.srt':
+                if ext == '.{sub_ext}':
+                    self.m_radioTypeSameAsInput.SetValue(True)
+                elif ext == '.srt':
                     self.m_radioTypeSrt.SetValue(True)
                 elif ext == '.ass':
                     self.m_radioTypeAss.SetValue(True)

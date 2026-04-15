@@ -30,6 +30,7 @@ class OutputFile(object):
               - `{sub_lang2}`/`{ref_lang2}` - 2-letter language code;
               - `{sub_name}`/`{ref_name}` - file name (without path and extension);
               - `{sub_dir}`/`{ref_dir}` - directory path;
+              - `{sub_ext}`/`{ref_ext}` - file extension without dot (e.g. srt, ass);
               - `{if:<field>:<value>}` - if field is set, append value;
               - `{if_not:<field>:<value>}` - if field is not set, append value.
 
@@ -110,6 +111,7 @@ class PathFormatter(object):
                 self.d[ prefix + 'lang2' ] = languages.get(code3=item.lang).code2 or ''
                 self.d[ prefix + 'name' ] = os.path.splitext(os.path.basename(item.path))[0]
                 self.d[ prefix + 'dir'  ] = os.path.dirname(item.path)
+                self.d[ prefix + 'ext'  ] = os.path.splitext(item.path)[1].lstrip('.').lower() or 'srt'
 
         path = _formatPattern(pattern, self.d)
         self.cache = (cacheKey, pattern, path)
@@ -119,7 +121,7 @@ def validatePattern(pattern):
     """Raise exception for invalid path pattern."""
     d = {}
     for prefix in [ 'sub_', 'ref_' ]:
-        for name in [ 'path', 'no', 'lang', 'lang2', 'name', 'dir' ]:
+        for name in [ 'path', 'no', 'lang', 'lang2', 'name', 'dir', 'ext' ]:
             d[ prefix + name ] = ''
     _formatPattern(pattern, d)
 
