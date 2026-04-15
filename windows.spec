@@ -5,7 +5,8 @@ import os
 ffmpeg_bin = r'C:\dev\ffmpeg\ffmpeg-master-latest-win64-gpl-shared\bin'
 vosk_pkg = os.path.join(
     r'C:\Users\Alvin\AppData\Local\Programs\Python\Python312\Lib\site-packages', 'vosk')
-vosk_model = r'C:\ProgramData\subsync\assets\speech'
+vosk_model = r'C:\ProgramData\subsync-ptbr\assets\speech'
+dict_dir   = r'C:\ProgramData\subsync-ptbr\assets\dict'
 
 extra_binaries = [
     (os.path.join(ffmpeg_bin, 'avcodec-62.dll'), '.'),
@@ -32,6 +33,9 @@ main_a = Analysis(['bin/subsync'],
             ('subsync/locale', 'locale'),
             (os.path.join(vosk_model, 'por.speech'), 'assets/speech'),
             (os.path.join(vosk_model, 'vosk-model-small-pt-0.3'), 'assets/speech/vosk-model-small-pt-0.3'),
+            (os.path.join(vosk_model, 'eng.speech'), 'assets/speech'),
+            (os.path.join(vosk_model, 'vosk-model-small-en-us-0.15'), 'assets/speech/vosk-model-small-en-us-0.15'),
+            (os.path.join(dict_dir, 'eng-por.dict'), 'assets/dict'),
             ],
         hiddenimports=[],
         hookspath=[],
@@ -101,6 +105,9 @@ portable_a = Analysis(['bin/portable'],
             ('subsync/locale', 'locale'),
             (os.path.join(vosk_model, 'por.speech'), 'assets/speech'),
             (os.path.join(vosk_model, 'vosk-model-small-pt-0.3'), 'assets/speech/vosk-model-small-pt-0.3'),
+            (os.path.join(vosk_model, 'eng.speech'), 'assets/speech'),
+            (os.path.join(vosk_model, 'vosk-model-small-en-us-0.15'), 'assets/speech/vosk-model-small-en-us-0.15'),
+            (os.path.join(dict_dir, 'eng-por.dict'), 'assets/dict'),
             ],
         hiddenimports=[],
         hookspath=[],
