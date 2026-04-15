@@ -223,7 +223,9 @@ class SyncWin(subsync.gui.layout.syncwin.SyncWin):
                     if lang.code2:
                         res.append(lang.code2)
 
-            res.append('srt')
+            _, sub_ext = os.path.splitext(self.task.sub.path)
+            ext = sub_ext.lstrip('.').lower() if sub_ext else 'srt'
+            res.append(ext)
             return '.'.join(res)
         except Exception as e:
             logger.warning('%r', e)

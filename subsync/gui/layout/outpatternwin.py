@@ -88,7 +88,6 @@ class OutputPatternWin ( wx.Dialog ):
 		gbSizer1.Add( self.m_staticText3, wx.GBPosition( 0, 4 ), wx.GBSpan( 1, 1 ), wx.ALIGN_CENTER_VERTICAL|wx.TOP|wx.RIGHT|wx.LEFT, 5 )
 
 		self.m_radioTypeSrt = wx.RadioButton( self.m_panelPredef, wx.ID_ANY, _(u"SubRIP"), wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
-		self.m_radioTypeSrt.SetValue( True )
 		gbSizer1.Add( self.m_radioTypeSrt, wx.GBPosition( 1, 4 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 
 		self.m_radioTypeSsa = wx.RadioButton( self.m_panelPredef, wx.ID_ANY, _(u"Sub Station Alpha"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -96,6 +95,10 @@ class OutputPatternWin ( wx.Dialog ):
 
 		self.m_radioTypeAss = wx.RadioButton( self.m_panelPredef, wx.ID_ANY, _(u"Advanced SSA"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		gbSizer1.Add( self.m_radioTypeAss, wx.GBPosition( 3, 4 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+
+		self.m_radioTypeSameAsInput = wx.RadioButton( self.m_panelPredef, wx.ID_ANY, _(u"Same as input"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_radioTypeSameAsInput.SetValue( True )
+		gbSizer1.Add( self.m_radioTypeSameAsInput, wx.GBPosition( 4, 4 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 
 
 		self.m_panelPredef.SetSizer( gbSizer1 )
@@ -249,29 +252,48 @@ class OutputPatternWin ( wx.Dialog ):
 
 		gbSizer2.Add( self.m_staticText18, wx.GBPosition( 5, 2 ), wx.GBSpan( 1, 1 ), wx.ALIGN_CENTER_VERTICAL|wx.TOP|wx.RIGHT|wx.LEFT, 5 )
 
+		self.m_staticTextSubExt = wx.StaticText( self.m_panelCustom, wx.ID_ANY, _(u"{sub_ext}"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticTextSubExt.Wrap( -1 )
+
+		self.m_staticTextSubExt.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, wx.EmptyString ) )
+
+		gbSizer2.Add( self.m_staticTextSubExt, wx.GBPosition( 6, 0 ), wx.GBSpan( 1, 1 ), wx.ALIGN_CENTER_VERTICAL|wx.TOP|wx.RIGHT|wx.LEFT, 5 )
+
+		self.m_staticTextRefExt = wx.StaticText( self.m_panelCustom, wx.ID_ANY, _(u"{ref_ext}"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticTextRefExt.Wrap( -1 )
+
+		self.m_staticTextRefExt.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, wx.EmptyString ) )
+
+		gbSizer2.Add( self.m_staticTextRefExt, wx.GBPosition( 6, 1 ), wx.GBSpan( 1, 1 ), wx.ALIGN_CENTER_VERTICAL|wx.TOP|wx.RIGHT|wx.LEFT, 5 )
+
+		self.m_staticTextExtDesc = wx.StaticText( self.m_panelCustom, wx.ID_ANY, _(u"file extension without dot (e.g. srt, ass)"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticTextExtDesc.Wrap( -1 )
+
+		gbSizer2.Add( self.m_staticTextExtDesc, wx.GBPosition( 6, 2 ), wx.GBSpan( 1, 1 ), wx.ALIGN_CENTER_VERTICAL|wx.TOP|wx.RIGHT|wx.LEFT, 5 )
+
 		self.m_staticText19 = wx.StaticText( self.m_panelCustom, wx.ID_ANY, _(u"{if:<field>:<value>}"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText19.Wrap( -1 )
 
 		self.m_staticText19.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, wx.EmptyString ) )
 
-		gbSizer2.Add( self.m_staticText19, wx.GBPosition( 6, 0 ), wx.GBSpan( 1, 2 ), wx.ALIGN_CENTER_VERTICAL|wx.TOP|wx.RIGHT|wx.LEFT, 5 )
+		gbSizer2.Add( self.m_staticText19, wx.GBPosition( 7, 0 ), wx.GBSpan( 1, 2 ), wx.ALIGN_CENTER_VERTICAL|wx.TOP|wx.RIGHT|wx.LEFT, 5 )
 
 		self.m_staticText20 = wx.StaticText( self.m_panelCustom, wx.ID_ANY, _(u"if <field> is set, append <value>"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText20.Wrap( -1 )
 
-		gbSizer2.Add( self.m_staticText20, wx.GBPosition( 6, 2 ), wx.GBSpan( 1, 1 ), wx.ALIGN_CENTER_VERTICAL|wx.TOP|wx.RIGHT|wx.LEFT, 5 )
+		gbSizer2.Add( self.m_staticText20, wx.GBPosition( 7, 2 ), wx.GBSpan( 1, 1 ), wx.ALIGN_CENTER_VERTICAL|wx.TOP|wx.RIGHT|wx.LEFT, 5 )
 
 		self.m_staticText21 = wx.StaticText( self.m_panelCustom, wx.ID_ANY, _(u"{if_not:<field>:<value>}"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText21.Wrap( -1 )
 
 		self.m_staticText21.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, wx.EmptyString ) )
 
-		gbSizer2.Add( self.m_staticText21, wx.GBPosition( 7, 0 ), wx.GBSpan( 1, 2 ), wx.ALL, 5 )
+		gbSizer2.Add( self.m_staticText21, wx.GBPosition( 8, 0 ), wx.GBSpan( 1, 2 ), wx.ALL, 5 )
 
 		self.m_staticText22 = wx.StaticText( self.m_panelCustom, wx.ID_ANY, _(u"if <field> is not set, append <value>"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText22.Wrap( -1 )
 
-		gbSizer2.Add( self.m_staticText22, wx.GBPosition( 7, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
+		gbSizer2.Add( self.m_staticText22, wx.GBPosition( 8, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 
 
 		fgSizer3.Add( gbSizer2, 1, wx.EXPAND, 5 )
@@ -331,6 +353,7 @@ class OutputPatternWin ( wx.Dialog ):
 		self.m_radioTypeSrt.Bind( wx.EVT_RADIOBUTTON, self.onNameSel )
 		self.m_radioTypeSsa.Bind( wx.EVT_RADIOBUTTON, self.onNameSel )
 		self.m_radioTypeAss.Bind( wx.EVT_RADIOBUTTON, self.onNameSel )
+		self.m_radioTypeSameAsInput.Bind( wx.EVT_RADIOBUTTON, self.onNameSel )
 		self.m_radioCustom.Bind( wx.EVT_RADIOBUTTON, self.onModeSel )
 		self.m_checkOverwriteFiles.Bind( wx.EVT_CHECKBOX, self.onCheckOverwriteFiles )
 		self.m_buttonOK.Bind( wx.EVT_BUTTON, self.onButtonOkClick )

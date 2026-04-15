@@ -33,7 +33,7 @@ persistent = {
         'overwriteExistingFiles': False,
         'showOverwriteExistingFilesConfirmPopup': True,
         'showLanguageNotSelectedPopup': True,
-        'batchOutPattern': os.path.join('{ref_dir}', '{ref_name}{if:sub_lang:.}{sub_lang}.srt'),
+        'batchOutPattern': os.path.join('{ref_dir}', '{ref_name}{if:sub_lang:.}{sub_lang}.{sub_ext}'),
         'batchSortFiles': False,
         'debugOptions': False,
         'logLevel': logging.WARNING,
