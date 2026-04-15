@@ -3,7 +3,9 @@
 import os
 
 ffmpeg_bin = r'C:\dev\ffmpeg\ffmpeg-master-latest-win64-gpl-shared\bin'
-vosk_dir = r'C:\dev\vosk\vosk-win64-0.3.45'
+vosk_pkg = os.path.join(
+    r'C:\Users\Alvin\AppData\Local\Programs\Python\Python312\Lib\site-packages', 'vosk')
+vosk_model = r'C:\ProgramData\subsync\assets\speech'
 
 extra_binaries = [
     (os.path.join(ffmpeg_bin, 'avcodec-62.dll'), '.'),
@@ -13,10 +15,10 @@ extra_binaries = [
     (os.path.join(ffmpeg_bin, 'swscale-9.dll'), '.'),
     (os.path.join(ffmpeg_bin, 'avdevice-62.dll'), '.'),
     (os.path.join(ffmpeg_bin, 'avfilter-11.dll'), '.'),
-    (os.path.join(vosk_dir, 'libvosk.dll'), '.'),
-    (os.path.join(vosk_dir, 'libgcc_s_seh-1.dll'), '.'),
-    (os.path.join(vosk_dir, 'libstdc++-6.dll'), '.'),
-    (os.path.join(vosk_dir, 'libwinpthread-1.dll'), '.'),
+    (os.path.join(vosk_pkg, 'libvosk.dll'), 'vosk'),
+    (os.path.join(vosk_pkg, 'libgcc_s_seh-1.dll'), 'vosk'),
+    (os.path.join(vosk_pkg, 'libstdc++-6.dll'), 'vosk'),
+    (os.path.join(vosk_pkg, 'libwinpthread-1.dll'), 'vosk'),
     ('gizmo.cp312-win_amd64.pyd', '.'),
 ]
 
@@ -28,6 +30,8 @@ main_a = Analysis(['bin/subsync'],
             ('subsync/key.pub', '.'),
             ('subsync/img', 'img'),
             ('subsync/locale', 'locale'),
+            (os.path.join(vosk_model, 'por.speech'), 'assets/speech'),
+            (os.path.join(vosk_model, 'vosk-model-small-pt-0.3'), 'assets/speech/vosk-model-small-pt-0.3'),
             ],
         hiddenimports=[],
         hookspath=[],
@@ -95,6 +99,8 @@ portable_a = Analysis(['bin/portable'],
             ('subsync/key.pub', '.'),
             ('subsync/img', 'img'),
             ('subsync/locale', 'locale'),
+            (os.path.join(vosk_model, 'por.speech'), 'assets/speech'),
+            (os.path.join(vosk_model, 'vosk-model-small-pt-0.3'), 'assets/speech/vosk-model-small-pt-0.3'),
             ],
         hiddenimports=[],
         hookspath=[],

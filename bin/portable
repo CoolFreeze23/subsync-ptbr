@@ -2,6 +2,7 @@
 
 import os
 import sys
+import shutil
 from subsync import config
 
 
@@ -14,6 +15,19 @@ config.assetdir   = os.path.join(config.shareddir, 'assets')
 
 if config.assetupd:
     config.assetupd += '-portable'
+
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    bundled_assets = os.path.join(sys._MEIPASS, 'assets')
+    if os.path.isdir(bundled_assets):
+        for root, dirs, files in os.walk(bundled_assets):
+            rel = os.path.relpath(root, bundled_assets)
+            target = os.path.join(config.assetdir, rel)
+            os.makedirs(target, exist_ok=True)
+            for f in files:
+                src = os.path.join(root, f)
+                dst = os.path.join(target, f)
+                if not os.path.exists(dst):
+                    shutil.copy2(src, dst)
 
 from subsync.__main__ import subsync
 res = subsync()
