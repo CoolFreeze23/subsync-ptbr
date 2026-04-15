@@ -9,6 +9,7 @@
 #include <vosk_api.h>
 #include <string>
 #include <sstream>
+#include "general/logger.h"
 #else
 #include <pocketsphinx.h>
 #endif
@@ -137,6 +138,7 @@ void SpeechRecognition::start(const AVStream *stream)
 
 	vosk_recognizer_set_words(m_recognizer, 1);
 	m_framePeriod = 1.0 / static_cast<double>(m_sampleRate);
+	logger::info("SpeechRec", "Vosk initialized: model='%s' sampleRate=%d", m_modelPath.c_str(), m_sampleRate);
 #else
 	if ((m_ps = ps_init(m_config)) == NULL)
 		throw EXCEPTION("can't init Sphinx engine")
@@ -165,7 +167,10 @@ void SpeechRecognition::stop()
 	{
 		const char *finalResult = vosk_recognizer_final_result(m_recognizer);
 		if (finalResult)
+		{
+			logger::debug("SpeechRec", "vosk final result: %.200s", finalResult);
 			parseVoskResult(finalResult);
+		}
 
 		vosk_recognizer_free(m_recognizer);
 		m_recognizer = nullptr;
@@ -201,11 +206,19 @@ void SpeechRecognition::feed(const AVFrame *frame)
 	const char *rawData = reinterpret_cast<const char*>(data);
 	int byteLen = size * sizeof(int16_t);
 
-	if (vosk_recognizer_accept_waveform(m_recognizer, rawData, byteLen))
+	int accepted = vosk_recognizer_accept_waveform(m_recognizer, rawData, byteLen);
+	if (accepted)
 	{
 		const char *result = vosk_recognizer_result(m_recognizer);
 		if (result)
+		{
+			logger::debug("SpeechRec", "vosk result: %.200s", result);
 			parseVoskResult(result);
+		}
+		else
+		{
+			logger::debug("SpeechRec", "vosk returned null result");
+		}
 	}
 #else
 	int no = ps_process_raw(m_ps, data, size, FALSE, FALSE);
@@ -356,8 +369,14 @@ void SpeechRecognition::parseVoskResult(const char *json)
 			double midTime = (startTime + endTime) / 2.0;
 			float duration = static_cast<float>(endTime - startTime);
 
+			logger::debug("SpeechRec", "word='%s' conf=%.3f start=%.3f end=%.3f minLen=%u minProb=%.3f",
+				word.c_str(), conf, startTime, endTime, m_minLen, m_minProb);
+
 			if (Utf8::size(word) >= m_minLen && conf >= m_minProb)
+			{
+				logger::debug("SpeechRec", "EMITTING word='%s' time=%.3f", word.c_str(), midTime + m_deltaTime);
 				m_wordsNotifier.notify(Word(word, midTime + m_deltaTime, duration, conf));
+			}
 		}
 
 		pos = objEnd + 1;

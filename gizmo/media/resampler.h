@@ -53,6 +53,8 @@ class Resampler : public AVOutput
 
 	private:
 		void initSwrContext(const AudioFormat &out, const AudioFormat &in);
+		void initSwrContextFromFrames(const AVFrame *outFrame, const AVFrame *inFrame,
+				const AudioFormat &outFmt, const AudioFormat &inFmt);
 
 	private:
 		std::shared_ptr<AVOutput> m_output;
