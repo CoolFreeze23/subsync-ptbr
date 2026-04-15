@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?define Name="subsync" ?>
-<?define FullName="Subtitle Speech Synchronizer" ?>
-<?define Manufacturer="sc0ty" ?>
+<?define Name="subsync-ptbr" ?>
+<?define FullName="SubSync PT-BR" ?>
+<?define Manufacturer="CoolFreeze23" ?>
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Codepage="1252" Id="*" Language="1033" Manufacturer="$(var.Manufacturer)" Name="$(var.FullName)" UpgradeCode="30cde9a7-1f56-49ef-8701-4d6bf8dee50a" Version="$(var.Version)">
+    <Product Codepage="1252" Id="*" Language="1033" Manufacturer="$(var.Manufacturer)" Name="$(var.FullName)" UpgradeCode="a1b2c3d4-5e6f-7890-abcd-ef1234567890" Version="$(var.Version)">
         <Package Compressed="yes" Description="$(var.FullName) $(var.Version) Installer" Id="*" InstallerVersion="500" InstallScope="perMachine" Keywords="Installer" Languages="1033" Manufacturer="sc0ty" Platform="x64" SummaryCodepage="1252"/>
         <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="A newer version of $(var.FullName) is already installed." />
         <Media Cabinet="subsync.cab" EmbedCab="yes" Id="1"/>

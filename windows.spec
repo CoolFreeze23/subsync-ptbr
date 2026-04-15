@@ -1,9 +1,28 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import os
+
+ffmpeg_bin = r'C:\dev\ffmpeg\ffmpeg-master-latest-win64-gpl-shared\bin'
+vosk_dir = r'C:\dev\vosk\vosk-win64-0.3.45'
+
+extra_binaries = [
+    (os.path.join(ffmpeg_bin, 'avcodec-62.dll'), '.'),
+    (os.path.join(ffmpeg_bin, 'avformat-62.dll'), '.'),
+    (os.path.join(ffmpeg_bin, 'avutil-60.dll'), '.'),
+    (os.path.join(ffmpeg_bin, 'swresample-6.dll'), '.'),
+    (os.path.join(ffmpeg_bin, 'swscale-9.dll'), '.'),
+    (os.path.join(ffmpeg_bin, 'avdevice-62.dll'), '.'),
+    (os.path.join(ffmpeg_bin, 'avfilter-11.dll'), '.'),
+    (os.path.join(vosk_dir, 'libvosk.dll'), '.'),
+    (os.path.join(vosk_dir, 'libgcc_s_seh-1.dll'), '.'),
+    (os.path.join(vosk_dir, 'libstdc++-6.dll'), '.'),
+    (os.path.join(vosk_dir, 'libwinpthread-1.dll'), '.'),
+    ('gizmo.cp312-win_amd64.pyd', '.'),
+]
 
 main_a = Analysis(['bin/subsync'],
         pathex=['.'],
-        binaries=[],
+        binaries=extra_binaries,
         datas=[
             ('LICENSE', '.'),
             ('subsync/key.pub', '.'),
@@ -25,7 +44,7 @@ main_exe = EXE(main_pyz,
         main_a.scripts,
         [],
         exclude_binaries=True,
-        name='subsync',
+        name='subsync-ptbr',
         debug=False,
         bootloader_ignore_signals=False,
         strip=False,
@@ -37,7 +56,7 @@ main_dbg = EXE(main_pyz,
         main_a.scripts,
         [],
         exclude_binaries=True,
-        name='subsync-debug',
+        name='subsync-ptbr-debug',
         debug=True,
         bootloader_ignore_signals=False,
         strip=False,
@@ -49,7 +68,7 @@ main_cmd = EXE(main_pyz,
         main_a.scripts,
         [],
         exclude_binaries=True,
-        name='subsync-cmd',
+        name='subsync-ptbr-cmd',
         debug=False,
         bootloader_ignore_signals=False,
         strip=False,
@@ -66,11 +85,11 @@ main_coll = COLLECT(main_exe,
         strip=False,
         upx=True,
         upx_exclude=[],
-        name='subsync')
+        name='subsync-ptbr')
 
 portable_a = Analysis(['bin/portable'],
         pathex=['.'],
-        binaries=[],
+        binaries=extra_binaries,
         datas=[
             ('LICENSE', '.'),
             ('subsync/key.pub', '.'),
@@ -94,7 +113,7 @@ portable_exe = EXE(portable_pyz,
         portable_a.zipfiles,
         portable_a.datas,
         [],
-        name='subsync-portable',
+        name='subsync-ptbr-portable',
         debug=False,
         bootloader_ignore_signals=False,
         strip=False,
