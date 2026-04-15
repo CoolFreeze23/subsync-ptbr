@@ -1,0 +1,40 @@
+fix: resolve 9 upstream issues (#188, #182, #191, #160, #135, #164, #165, #102, #155)
+
+Addresses the following open issues from sc0ty/subsync:
+
+- #188: Last subtitle line timestamp extending to end of video
+  Clamp subtitle durations after transform_framerate to prevent
+  events from stretching to absurd lengths (3x original or 30s max).
+
+- #182/#97: 'Invalid output pattern' when filenames contain braces
+  Unknown {variables} in output patterns are now escaped and treated
+  as literal text instead of raising a KeyError.
+
+- #191: CLI mode spawns a visible console window on Windows
+  Only call AllocConsole when stdout is not already writable, and
+  prefer AttachConsole to the parent process first.
+
+- #160: No error message when CLI sync fails (not enough points)
+  Print the actual vs required point count and suggest --effort=1.0
+  --min-points-no=2 as a workaround for difficult files.
+
+- #135: No way to Ctrl+C and save partial result in CLI
+  SIGINT handler now saves synchronized subtitles if correlation
+  was already achieved before terminating.
+
+- #164: Small offset (<2s) subtitles fail to synchronize
+  Lower default minPointsNo from 20 to 10 so near-perfect subs
+  can lock in with fewer correlation points.
+
+- #165: No default language setting or default view mode
+  Add defaultSubLang, defaultRefLang, and defaultView settings.
+  Languages fall back to defaults when no last-used value exists.
+  defaultView='batch' starts in batch mode by default.
+
+- #102: No taskbar progress indicator on Windows
+  SyncWin now updates the Windows taskbar progress via ITaskbarList3
+  COM interface (gracefully degrades if comtypes unavailable).
+
+- #155: Incomplete documentation
+  Comprehensive README rewrite with CLI reference, batch patterns,
+  configuration guide, supported formats/languages, and build guide.

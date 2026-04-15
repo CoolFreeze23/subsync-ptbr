@@ -1,6 +1,7 @@
 from subsync import utils
 from subsync.translations import _
 from subsync.data import languages
+from subsync.data.filetypes import subtitleTypes
 from subsync.error import Error
 import os
 
@@ -111,7 +112,9 @@ class PathFormatter(object):
                 self.d[ prefix + 'lang2' ] = languages.get(code3=item.lang).code2 or ''
                 self.d[ prefix + 'name' ] = os.path.splitext(os.path.basename(item.path))[0]
                 self.d[ prefix + 'dir'  ] = os.path.dirname(item.path)
-                self.d[ prefix + 'ext'  ] = os.path.splitext(item.path)[1].lstrip('.').lower() or 'srt'
+                raw_ext = os.path.splitext(item.path)[1].lower()
+                known_sub_exts = {t['ext'] for t in subtitleTypes}
+                self.d[ prefix + 'ext'  ] = raw_ext.lstrip('.') if raw_ext in known_sub_exts else 'srt'
 
         path = _formatPattern(pattern, self.d)
         self.cache = (cacheKey, pattern, path)
