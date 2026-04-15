@@ -16,8 +16,49 @@ import pysubs2.exceptions
 import os
 import time
 
+import sys
 import logging
 logger = logging.getLogger(__name__)
+
+
+class _TaskbarProgress:
+    """Windows taskbar progress via SetProgressValue win32 API."""
+    TBPF_NOPROGRESS = 0
+    TBPF_NORMAL = 2
+
+    def __init__(self, hwnd):
+        self._hwnd = hwnd
+        self._setval = None
+        self._setstate = None
+        if sys.platform != 'win32':
+            return
+        try:
+            try:
+                import comtypes.client
+                clsid = '{56FDF344-FD6D-11d0-958A-006097C9A090}'
+                tb = comtypes.client.CreateObject(clsid)
+                iid = '{ea1afb91-9e28-4b86-90e9-9e9f8a5eefaf}'
+                self._com = tb.QueryInterface(comtypes.GUID(iid))
+                self._setval = lambda h, v, t: self._com.SetProgressValue(h, v, t)
+                self._setstate = lambda h, s: self._com.SetProgressState(h, s)
+            except Exception:
+                pass
+        except Exception:
+            pass
+
+    def setProgress(self, value, total=100):
+        if self._setval:
+            try:
+                self._setval(self._hwnd, int(value), int(total))
+            except Exception:
+                self._setval = None
+
+    def clear(self):
+        if self._setstate:
+            try:
+                self._setstate(self._hwnd, self.TBPF_NOPROGRESS)
+            except Exception:
+                pass
 
 
 class SyncWin(subsync.gui.layout.syncwin.SyncWin):
@@ -45,6 +86,7 @@ class SyncWin(subsync.gui.layout.syncwin.SyncWin):
 
         self.closing = False
         self.startTime = time.monotonic()
+        self._taskbar = None
 
         self.sync = SyncController(listener=self)
         self.sync.synchronize(task, timeout=0.5, interactive=True)
@@ -71,8 +113,19 @@ class SyncWin(subsync.gui.layout.syncwin.SyncWin):
         self.m_textMaxChange.SetLabel(utils.timeStampFractionFmt(status.maxChange))
         if finished:
             self.m_gaugeProgress.SetValue(100)
+            progress_pct = 100
         else:
-            self.m_gaugeProgress.SetValue(int(100 * status.progress))
+            progress_pct = int(100 * status.progress)
+            self.m_gaugeProgress.SetValue(progress_pct)
+
+        if self._taskbar is None:
+            try:
+                self._taskbar = _TaskbarProgress(self.GetParent().GetHandle()
+                        if self.GetParent() else self.GetHandle())
+            except Exception:
+                self._taskbar = False
+        if self._taskbar:
+            self._taskbar.setProgress(progress_pct)
 
         if status.correlated and not self.m_bitmapTick.IsShown():
             self.m_bitmapCross.Hide()
@@ -106,6 +159,8 @@ class SyncWin(subsync.gui.layout.syncwin.SyncWin):
         self.Fit()
         self.Layout()
 
+        if self._taskbar:
+            self._taskbar.clear()
         self.suspendBlocker.unlock()
 
     @gui_thread

@@ -139,7 +139,8 @@ class App(object):
             if not self.assetsDownloader.run(tasks):
                 return 2
 
-            sync = SyncController(listener=self)
+            self._sync = sync = SyncController(listener=self)
+            self._currentTask = tasks[0] if tasks else None
             sync.synchronize(tasks, timeout=1)
             sync.wait()
 
@@ -150,7 +151,16 @@ class App(object):
 
         except KeyboardInterrupt:
             pr.println(1, '[-] interrupted by user')
-            sync and sync.terminate()
+            if sync:
+                sync.terminate()
+                try:
+                    status = sync.getStatus()
+                    if status and status.correlated and self._currentTask and self._currentTask.out:
+                        pr.println(0, '[+] saving partial result before exit...')
+                        path = sync.saveSynchronizedSubtitles(task=self._currentTask)
+                        pr.println(0, '[+] partial result saved to {}'.format(path))
+                except Exception as err:
+                    pr.println(1, '[-] could not save partial result: {}'.format(err))
             return 1
 
         except error.Error as err:
@@ -158,6 +168,7 @@ class App(object):
             raise
 
     def onJobStart(self, task):
+        self._currentTask = task
         pr.println(1, '[*] starting synchronization {}'.format(task.sub.path))
         pr.println(2, '[+] sub: {}'.format(task.sub))
         pr.println(2, '[+] ref: {}'.format(task.ref))
@@ -173,7 +184,13 @@ class App(object):
             pr.println(1, '[+] done, saved to {}'.format(result.path))
             self.succeeded += 1
         elif not result.terminated:
-            pr.println(0, '[-] couldn\'t synchronize!')
+            if status and not status.correlated:
+                pr.println(0, '[-] couldn\'t synchronize: not enough synchronization points '
+                        '(got {}, need {})'.format(
+                            status.points, settings().minPointsNo))
+                pr.println(0, '[-] try: --effort=1.0 --min-points-no=2 for difficult files')
+            else:
+                pr.println(0, '[-] couldn\'t synchronize!')
         pr.println(1, '')
 
     def printStats(self, status, finished=False):
