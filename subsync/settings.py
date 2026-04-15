@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 persistent = {
         'language': None,
         'maxPointDist': 2.0,
-        'minPointsNo': 20,
+        'minPointsNo': 10,
         'appendLangCode': 3,
         'outputCharEnc': 'UTF-8',
         'windowSize': 30.0 * 60.0,
@@ -27,6 +27,9 @@ persistent = {
         'lastdir': '',
         'lastSubLang': None,
         'lastRefLang': None,
+        'defaultSubLang': None,
+        'defaultRefLang': None,
+        'defaultView': 'basic',
         'refsCache': True,
         'autoUpdate': True,
         'askForUpdate': True,

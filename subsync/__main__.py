@@ -64,7 +64,7 @@ def gui(sync=None, fromFile=None, batch=False, options={}, **args):
         _init(options)
         tasks = _loadTasks(sync, fromFile)
 
-        if batch or len(tasks) > 1:
+        if batch or len(tasks) > 1 or (not tasks and settings().defaultView == 'batch'):
             win = BatchWin(None, tasks)
         else:
             task = None
@@ -90,11 +90,12 @@ def cli(sync=None, fromFile=None, verbose=1, offline=False, options={}, **args):
 
     if sys.platform == 'win32':
         try:
-            import ctypes
-            ctypes.windll.kernel32.AllocConsole()
-            sys.stdout = open('CONOUT$', 'w')
-            sys.stderr = open('CONOUT$', 'w')
-            sys.stdin = open('CONIN$', 'r')
+            if not sys.stdout or not sys.stdout.writable():
+                import ctypes
+                ctypes.windll.kernel32.AttachConsole(-1) or ctypes.windll.kernel32.AllocConsole()
+                sys.stdout = open('CONOUT$', 'w')
+                sys.stderr = open('CONOUT$', 'w')
+                sys.stdin = open('CONIN$', 'r')
         except Exception as err:
             cli.pr.printException(0, err, 'console allocation failed')
 

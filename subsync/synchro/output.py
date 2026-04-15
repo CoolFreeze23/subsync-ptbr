@@ -134,11 +134,26 @@ def _formatPattern(pattern, formatter):
             })
 
     except KeyError as e:
-        raise Error(_('Invalid output pattern, invalid keyword: {}').format(e),
-                pattern=pattern)
+        logger.warning('unknown pattern variable %s in "%s", treating as literal', e, pattern)
+        escaped = _escapeUnknownVars(pattern, formatter)
+        return escaped.format(**formatter, **{
+            'if': ConditionalFormatter(formatter),
+            'if_not': ConditionalFormatter(formatter, inverted=True)
+            })
 
     except Exception as e:
         raise Error(_('Invalid output pattern, {}').format(e), pattern=pattern)
+
+
+def _escapeUnknownVars(pattern, known_keys):
+    import re
+    all_known = set(known_keys.keys()) | {'if', 'if_not'}
+    def replacer(m):
+        key = m.group(1).split(':')[0].split('.')[0]
+        if key in all_known:
+            return m.group(0)
+        return '{' + m.group(0) + '}'
+    return re.sub(r'\{([^{}]+)\}', replacer, pattern)
 
 
 class ConditionalFormatter(object):

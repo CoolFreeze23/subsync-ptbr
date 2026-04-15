@@ -36,8 +36,22 @@ class Subtitles(pysubs2.SSAFile):
 
     def synchronize(self, formula):
         res = copy.deepcopy(self)
+        for event in res:
+            orig_duration = event.end - event.start
+            if orig_duration < 0:
+                orig_duration = 0
+            event._orig_duration = orig_duration
         res.transform_framerate(formula.a*25.0, 25.0)
         res.shift(s=formula.b)
+        for event in res:
+            orig_duration = getattr(event, '_orig_duration', None)
+            if orig_duration is not None:
+                max_duration = max(orig_duration * 3, 30000)
+                actual_duration = event.end - event.start
+                if actual_duration > max_duration:
+                    logger.debug('clamping subtitle duration from %d to %d ms: %r',
+                            actual_duration, orig_duration, event)
+                    event.end = event.start + orig_duration
         res.sort()
         while len(res) and res[0].end <= 0:
             logger.debug('removing subtitle line with negative time: %r', res[0])
