@@ -263,6 +263,7 @@ class SyncWin(subsync.gui.layout.syncwin.SyncWin):
 
     def genDefaultFileName(self, path, suffix=None):
         try:
+            from subsync.data.filetypes import subtitleTypes, videoExt
             res = []
             basename, _ = os.path.splitext(os.path.basename(path))
             res.append(basename)
@@ -279,7 +280,12 @@ class SyncWin(subsync.gui.layout.syncwin.SyncWin):
                         res.append(lang.code2)
 
             _, sub_ext = os.path.splitext(self.task.sub.path)
-            ext = sub_ext.lstrip('.').lower() if sub_ext else 'srt'
+            sub_ext_lower = sub_ext.lower() if sub_ext else ''
+            known_sub_exts = {t['ext'] for t in subtitleTypes}
+            if sub_ext_lower in known_sub_exts:
+                ext = sub_ext_lower.lstrip('.')
+            else:
+                ext = 'srt'
             res.append(ext)
             return '.'.join(res)
         except Exception as e:

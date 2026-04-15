@@ -1,0 +1,30 @@
+Modernized, PT-BR optimized fork of [sc0ty/subsync](https://github.com/sc0ty/subsync).
+
+## Highlights
+- **Vosk speech engine** replaces PocketSphinx — dramatically better PT-BR recognition
+- **ASS/SSA subtitle support** — styling and formatting fully preserved, only timing changes
+- **Accent-insensitive matching** — handles ação/acao, você/voce correctly
+- **FFmpeg 5.x/6.x/7.x** compatible (with 4.x backward compat)
+- **Pre-bundled PT-BR model** — works out of the box, no extra downloads needed
+- **Installs alongside original subsync** — different app name and GUID
+
+## Fixes in This Release (vs upstream)
+| Issue | Fix |
+|-------|-----|
+| #188 | Last subtitle line no longer extends to end of video |
+| #182/#97 | Filenames with `{}` braces no longer cause "Invalid output pattern" |
+| #191 | CLI mode no longer spawns a visible console window on Windows |
+| #160 | Clear error message when sync fails (shows point count + suggestions) |
+| #135 | Ctrl+C saves partial result if correlation was achieved |
+| #164 | Small offset (<2s) subtitles now sync correctly (lowered minPointsNo) |
+| #165 | Default language and view mode settings added |
+| #102 | Taskbar progress indicator on Windows |
+| #155 | Comprehensive documentation (CLI reference, batch patterns, config guide) |
+| — | Float → int casts for wxPython 4.2 strict type checking |
+| — | Division-by-zero in Line constructor |
+| — | RAII cleanup for audio/subtitle decoders |
+| — | SpeechRecognition flush() actually drains final buffer |
+| — | cmdargs returns {} on error instead of None |
+
+## Downloads
+- **`subsync-ptbr-portable.exe`** — Portable executable (no install needed, PT-BR model bundled)
