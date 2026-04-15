@@ -38,8 +38,7 @@ class build_ext(setuptools.command.build_ext.build_ext):
     user_options = setuptools.command.build_ext.build_ext.user_options + [
             ('use-pkg-config=', None, 'yes/no, use pkg-config to obtain information about installed libraries'),
             ('ffmpeg-dir=', None, 'ffmpeg library location'),
-            ('sphinxbase-dir=', None, 'sphinxbase library location'),
-            ('pocketsphinx-dir=', None, 'pocketsphinx library location'),
+            ('vosk-dir=', None, 'vosk library location'),
             ]
 
     def initialize_options(self):
@@ -48,13 +47,14 @@ class build_ext(setuptools.command.build_ext.build_ext):
         self.ldflags = []
         self.use_pkg_config   = os.environ.get('USE_PKG_CONFIG')
         self.ffmpeg_dir       = os.environ.get('FFMPEG_DIR')
-        self.sphinxbase_dir   = os.environ.get('SPHINXBASE_DIR')
-        self.pocketsphinx_dir = os.environ.get('POCKETSPHINX_DIR')
+        self.vosk_dir         = os.environ.get('VOSK_DIR')
 
     def finalize_options(self):
         super().finalize_options()
 
         use_pkg_config = False
+        if self.use_pkg_config is not None:
+            self.use_pkg_config = self.use_pkg_config.strip()
         if self.use_pkg_config is None:
             use_pkg_config = self.has_pkg_config()
         elif self.use_pkg_config == 'yes':
@@ -68,56 +68,39 @@ class build_ext(setuptools.command.build_ext.build_ext):
 
         if self.ffmpeg_dir is not None and not os.path.isdir(self.ffmpeg_dir):
             raise Exception('ffmpeg directory does not exist: {}'.format(self.ffmpeg_dir))
-        if self.sphinxbase_dir is not None and not os.path.isdir(self.sphinxbase_dir):
-            raise Exception('sphinxbase directory does not exist: {}'.format(self.sphinxbase_dir))
-        if self.pocketsphinx_dir is not None and not os.path.isdir(self.pocketsphinx_dir):
-            raise Exception('pocketsphinx directory does not exist: {}'.format(self.pocketsphinx_dir))
+        if self.vosk_dir is not None and not os.path.isdir(self.vosk_dir):
+            raise Exception('vosk directory does not exist: {}'.format(self.vosk_dir))
 
         ffmpeg_libs = [
-                'avdevice',
                 'avformat',
-                'avfilter',
                 'avcodec',
                 'swresample',
-                'swscale',
                 'avutil',
                 ]
 
-        sphinx_libs = [
-                'pocketsphinx',
-                'sphinxbase',
-                ]
+        vosk_libs = ['libvosk']
 
         if use_pkg_config:
-            pkgs = [ 'lib' + name for name in ffmpeg_libs ] + sphinx_libs
+            pkgs = [ 'lib' + name for name in ffmpeg_libs ]
             self.cflags       += self.get_pkg_config('--cflags-only-other', pkgs)
             self.ldflags      += self.get_pkg_config('--libs-only-other',   pkgs)
             self.include_dirs += self.get_pkg_config('--cflags-only-I', pkgs, strip_prefixes=['-I'])
             self.library_dirs += self.get_pkg_config('--libs-only-L', pkgs, strip_prefixes=['-L', '-R'])
             self.libraries    += self.get_pkg_config('--libs-only-l', pkgs, strip_prefixes=['-l'])
-
+            self.libraries    += ['vosk']
         else:
-            self.libraries += ffmpeg_libs + sphinx_libs
+            self.libraries += ffmpeg_libs + vosk_libs
 
         import pybind11
         self.include_dirs += self.get_paths(pybind11.get_include(), '')
-        self.include_dirs += self.get_paths(pybind11.get_include(True), '')
 
-        self.include_dirs += self.get_paths(self.ffmpeg_dir,       '', 'include')
-        self.include_dirs += self.get_paths(self.sphinxbase_dir,   '', 'include')
-        self.include_dirs += self.get_paths(self.pocketsphinx_dir, '', 'include')
-
+        self.include_dirs += self.get_paths(self.ffmpeg_dir, '', 'include')
         self.library_dirs += [ sysconfig.get_path('include') ]
-        self.library_dirs += self.get_paths(self.ffmpeg_dir,       '', 'lib')
-        self.library_dirs += self.get_paths(self.sphinxbase_dir,   '', 'lib')
-        self.library_dirs += self.get_paths(self.pocketsphinx_dir, '', 'lib')
+        self.library_dirs += self.get_paths(self.ffmpeg_dir, '', 'lib')
 
-        if sys.platform == 'win32':
-            bit64 = sys.maxsize > 2**32
-            arch = 'x64' if bit64 else 'win32'
-            self.include_dirs += self.get_paths(self.sphinxbase_dir,   os.path.join('include', 'win32'))
-            self.library_dirs += self.get_paths(self.sphinxbase_dir,   os.path.join('bin', 'Release', arch))
-            self.library_dirs += self.get_paths(self.pocketsphinx_dir, os.path.join('bin', 'Release', arch))
+        if self.vosk_dir:
+            self.include_dirs += [self.vosk_dir]
+            self.library_dirs += [self.vosk_dir]
 
     def build_extensions(self):
         if self.compiler.compiler_type in ['unix', 'cygwin', 'mingw32']:
@@ -152,7 +135,7 @@ class build_ext(setuptools.command.build_ext.build_ext):
             ext.extra_link_args    = self.ldflags
 
     def setup_msvc(self):
-        self.cflags += [ '/EHsc' ]
+        self.cflags += [ '/EHsc', '/std:c++17', '/O2' ]
 
     def get_paths(self, base_dir, *suffixes):
         if base_dir:
@@ -429,6 +412,7 @@ setup(
                 define_macros = [
                     ('NDEBUG', '1'),
                     ('USE_PYBIND11', '1'),
+                    ('USE_VOSK', '1'),
                     ],
                 language = 'c++',
                 ),
